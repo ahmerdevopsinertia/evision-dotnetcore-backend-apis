@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '12345'
+      POSTGRES_DB: biodata
+      POSTGRES_HOST_AUTH_METHOD: trust  # Add this line
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  webapi:
+    build: .
+    container_name: minimal_api
+    depends_on:
+      - postgres
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres_container;Port=5432;Database=biodata;Username=postgres;Password=12345
+    ports:
+      - "5000:8080"
+
+volumes:
+  postgres_data:
